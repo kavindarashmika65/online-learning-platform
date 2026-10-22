@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold text-primary">Welcome, {{ current_user.full_name }}!</h2>
+            <p class="text-muted">Here is an overview of your learning progress.</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 bg-primary text-white h-100 rounded-4">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-book-open fa-3x mb-3"></i>
+                    <h3>My Courses</h3>
+                    <p class="mb-0">You have 0 active courses</p>
+                    <a href="#" class="btn btn-light mt-3 rounded-pill fw-medium text-primary">Browse Courses</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm border-0 h-100 rounded-4">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3"><i class="fas fa-chart-line me-2 text-primary"></i>Recent Progress</h4>
+                    <div class="alert alert-light text-center py-5 border">
+                        <p class="text-muted mb-0">No recent activity. Start learning today!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

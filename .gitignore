@@ -1,0 +1,14 @@
+# Environments
+venv/
+env/
+
+# Environment Variables
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database and Uploads
+instance/

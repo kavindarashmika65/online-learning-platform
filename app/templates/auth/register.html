@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Register - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card auth-card p-4 p-md-5 my-4">
+                    <div class="text-center mb-4">
+                        <div class="display-4 text-primary mb-3"><i class="fas fa-user-plus"></i></div>
+                        <h3 class="fw-bold">Create an Account</h3>
+                        <p class="text-muted">Join us as a Student or Teacher.</p>
+                    </div>
+
+                    <form method="POST" action="">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.full_name.label(class="form-label fw-medium") }}
+                            {% if form.full_name.errors %}
+                                {{ form.full_name(class="form-control is-invalid", placeholder="John Doe") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.full_name.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.full_name(class="form-control", placeholder="John Doe") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label fw-medium") }}
+                            {% if form.email.errors %}
+                                {{ form.email(class="form-control is-invalid", placeholder="name@example.com") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.email(class="form-control", placeholder="name@example.com") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.password.label(class="form-label fw-medium") }}
+                                {% if form.password.errors %}
+                                    {{ form.password(class="form-control is-invalid", placeholder="Min 8 characters") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.password(class="form-control", placeholder="Min 8 characters") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.confirm_password.label(class="form-label fw-medium") }}
+                                {% if form.confirm_password.errors %}
+                                    {{ form.confirm_password(class="form-control is-invalid", placeholder="Confirm password") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.confirm_password.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.confirm_password(class="form-control", placeholder="Confirm password") }}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.role.label(class="form-label fw-medium") }}
+                            {% if form.role.errors %}
+                                {{ form.role(class="form-select is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.role.errors %}<span>{{ error }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.role(class="form-select") }}
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            {{ form.submit(class="btn btn-gradient") }}
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <span class="text-muted">Already have an account?</span>
+                            <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold text-primary">Login Here</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
