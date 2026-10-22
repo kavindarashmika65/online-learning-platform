@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}My Earnings - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <h2 class="fw-bold text-primary mb-4">Financial Overview</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 bg-primary text-white h-100 rounded-4">
+                <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
+                    <h5 class="mb-2 opacity-75">Total Earnings</h5>
+                    <h1 class="fw-bold mb-0 display-4">LKR {{ total_earnings|default('0.00') }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 bg-success text-white h-100 rounded-4">
+                <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
+                    <h5 class="mb-2 opacity-75">Total Enrollments</h5>
+                    <h1 class="fw-bold mb-0 display-4">{{ total_enrollments|default('0') }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
+            <h5 class="fw-bold mb-0">Recent Transactions</h5>
+        </div>
+        <div class="card-body p-4">
+            {% if transactions %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                        <tr>
+                            <td>{{ tx.student_name }}</td>
+                            <td>{{ tx.course_title }}</td>
+                            <td class="text-success fw-medium">+LKR {{ tx.amount }}</td>
+                            <td>{{ tx.date.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-light text-center border py-4 mb-0">No transactions recorded yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
