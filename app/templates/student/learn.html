@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Learn - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-4 pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">{{ course.title }}</h2>
+        <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">Back to Dashboard</a>
+    </div>
+
+    <div class="row">
+        <!-- Main Content Area (Video/PDF Player) -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-body p-0 d-flex flex-column justify-content-center align-items-center" id="player-container" style="min-height: 550px; background-color: #e9ecef; overflow: hidden;">
+                    
+                    <div id="default-message" class="text-center p-5">
+                        <i class="fas fa-play-circle fa-4x text-secondary mb-3"></i>
+                        <h4 class="text-secondary fw-bold">Select a lesson from the list</h4>
+                        <p class="text-muted">Click on any video or PDF on the right to start learning.</p>
+                    </div>
+
+                    <!-- Iframe for Video/PDF (hidden by default) -->
+                    <iframe id="lesson-frame" class="w-100 h-100 d-none" style="min-height: 550px; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                
+                <!-- Lesson Title details (hidden by default) -->
+                <div class="p-4 border-top d-none bg-white" id="lesson-details">
+                    <h4 id="current-lesson-title" class="fw-bold mb-1 text-dark"></h4>
+                    <span id="current-lesson-type" class="badge bg-primary rounded-pill"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar (Lesson List) -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+                <div class="card-header bg-white border-bottom pt-4 pb-3 px-4">
+                    <h5 class="fw-bold mb-0">Course Content</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" style="max-height: 600px; overflow-y: auto;">
+                        {% if lessons %}
+                            {% for lesson in lessons %}
+                                <button onclick="loadLesson('{{ lesson.content_type }}', '{{ lesson.storage_reference }}', '{{ lesson.title|escape }}')" class="list-group-item list-group-item-action py-3 px-4 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <small class="text-muted d-block mb-1">Lesson {{ lesson.position }}</small>
+                                            <strong class="mb-0 text-dark">{{ lesson.title }}</strong>
+                                        </div>
+                                        <div>
+                                            {% if lesson.content_type == 'video' %}
+                                                <i class="fab fa-youtube text-danger fs-3"></i>
+                                            {% elif lesson.content_type == 'document' %}
+                                                <i class="fas fa-file-pdf text-primary fs-3"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </button>
+                            {% endfor %}
+                        {% else %}
+                            <div class="p-5 text-center text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-3 text-light"></i>
+                                <p>No lessons available yet.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadLesson(type, reference, title) {
+        const frame = document.getElementById('lesson-frame');
+        const defaultMsg = document.getElementById('default-message');
+        const details = document.getElementById('lesson-details');
+        const titleEl = document.getElementById('current-lesson-title');
+        const typeEl = document.getElementById('current-lesson-type');
+
+        // Show player, hide default message
+        defaultMsg.classList.add('d-none');
+        frame.classList.remove('d-none');
+        details.classList.remove('d-none');
+        
+        titleEl.textContent = title;
+
+        if (type === 'video') {
+            typeEl.textContent = 'Video Lesson';
+            typeEl.className = 'badge bg-danger rounded-pill';
+            
+            // Format YouTube URL to Embed URL
+            let embedUrl = reference;
+            if (reference.includes('youtube.com/watch')) {
+                const urlParams = new URL(reference).searchParams;
+                embedUrl = 'https://www.youtube.com/embed/' + urlParams.get('v');
+            } else if (reference.includes('youtu.be/')) {
+                const videoId = reference.split('youtu.be/')[1].split('?')[0];
+                embedUrl = 'https://www.youtube.com/embed/' + videoId;
+            }
+            frame.src = embedUrl;
+            
+        } else if (type === 'document') {
+            typeEl.textContent = 'PDF Document';
+            typeEl.className = 'badge bg-primary rounded-pill';
+            
+            // Link to PDF
+            frame.src = "{{ url_for('static', filename='uploads/pdfs/') }}" + reference;
+        }
+    }
+</script>
+{% endblock %}
