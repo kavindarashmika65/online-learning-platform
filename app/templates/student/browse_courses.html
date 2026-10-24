@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Browse Courses - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Explore Courses</h2>
+        <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">Back to Dashboard</a>
+    </div>
+    
+    <div class="row">
+        {% if courses %}
+            {% for course in courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h5 class="fw-bold mb-2">{{ course.title }}</h5>
+                        <p class="text-muted small mb-3">{{ course.description[:100] }}...</p>
+                        <h6 class="text-success fw-bold mb-4">LKR {{ course.price }}</h6>
+                        
+                        <div class="mt-auto">
+                            {% if course.id in enrolled_course_ids %}
+                                <button class="btn btn-secondary rounded-pill w-100" disabled>Already Enrolled</button>
+                            {% else %}
+                                <form action="{{ url_for('student.enroll', course_id=course.id) }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-primary rounded-pill w-100">Enroll Now</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No courses are available at the moment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

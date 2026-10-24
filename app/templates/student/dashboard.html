@@ -3,35 +3,39 @@
 
 {% block content %}
 <div class="container mt-5 pt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h2 class="fw-bold text-primary">Welcome, {{ current_user.full_name }}!</h2>
-            <p class="text-muted">Here is an overview of your learning progress.</p>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">My Active Courses</h2>
+        <a href="{{ url_for('student.browse_courses') }}" class="btn btn-outline-primary rounded-pill px-4">Browse New Courses</a>
     </div>
     
     <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-0 bg-primary text-white h-100 rounded-4">
-                <div class="card-body p-4 text-center">
-                    <i class="fas fa-book-open fa-3x mb-3"></i>
-                    <h3>My Courses</h3>
-                    <p class="mb-0">You have 0 active courses</p>
-                    <a href="#" class="btn btn-light mt-3 rounded-pill fw-medium text-primary">Browse Courses</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-8 mb-4">
-            <div class="card shadow-sm border-0 h-100 rounded-4">
-                <div class="card-body p-4">
-                    <h4 class="fw-bold mb-3"><i class="fas fa-chart-line me-2 text-primary"></i>Recent Progress</h4>
-                    <div class="alert alert-light text-center py-5 border">
-                        <p class="text-muted mb-0">No recent activity. Start learning today!</p>
+        {% if enrollments %}
+            {% for enrollment in enrollments %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h5 class="fw-bold mb-2">{{ enrollment.course.title }}</h5>
+                        <p class="text-muted small mb-4">{{ enrollment.course.description[:80] }}...</p>
+                        
+                        <div class="mt-auto d-grid gap-2">
+                            <a href="{{ url_for('student.learn', course_id=enrollment.course.id) }}" class="btn btn-primary rounded-pill">Start Learning</a>
+                            <form action="{{ url_for('student.remove_course', course_id=enrollment.course.id) }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-outline-danger rounded-pill w-100" onclick="return confirm('Are you sure you want to remove this course?');">Remove Course</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="alert alert-light border py-5 rounded-4">
+                    <p class="text-muted mb-3">You haven't enrolled in any courses yet.</p>
+                    <a href="{{ url_for('student.browse_courses') }}" class="btn btn-primary rounded-pill px-4">Find a Course</a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
