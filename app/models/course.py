@@ -30,6 +30,11 @@ class Course(db.Model):
     lessons = db.relationship('Lesson', backref='course', cascade="all, delete-orphan", lazy=True)
     enrollments = db.relationship('Enrollment', backref='course', lazy=True)
     reviews = db.relationship('Review', backref='course', lazy=True)
+    # Relationships
+    teacher = db.relationship('User', foreign_keys=[teacher_id], backref='courses_taught') # මෙය අලුතින් එක් කරන්න
+    lessons = db.relationship('Lesson', backref='course', cascade="all, delete-orphan", lazy=True)
+    enrollments = db.relationship('Enrollment', backref='course', lazy=True)
+    reviews = db.relationship('Review', backref='course', lazy=True)
 
 class Review(db.Model):
     __tablename__ = 'reviews'

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Checkout - {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4 p-md-5">
+                    <h3 class="fw-bold text-primary mb-4">Course Checkout</h3>
+                    
+                    <div class="alert alert-info rounded-3 mb-4">
+                        <h5 class="fw-bold">{{ course.title }}</h5>
+                        <p class="mb-1 text-muted">{{ course.description[:100] }}...</p>
+                        <h4 class="fw-bold text-success mt-2 mb-0">LKR {{ course.price }}</h4>
+                    </div>
+
+                    <h5 class="fw-bold mb-3">Teacher's Bank Details</h5>
+                    <div class="bg-light p-4 rounded-3 mb-4 border">
+                        {% if course.teacher.bank_name %}
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Bank Name:</div>
+                                <div class="col-sm-8 fw-bold">{{ course.teacher.bank_name }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Branch:</div>
+                                <div class="col-sm-8 fw-bold">{{ course.teacher.branch }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-muted">Account Name:</div>
+                                <div class="col-sm-8 fw-bold">{{ course.teacher.account_name }}</div>
+                            </div>
+                            <div class="row mb-0">
+                                <div class="col-sm-4 text-muted">Account Number:</div>
+                                <div class="col-sm-8 fw-bold text-primary fs-5">{{ course.teacher.account_number }}</div>
+                            </div>
+                        {% else %}
+                            <p class="text-danger mb-0">Bank details are not provided by the teacher yet.</p>
+                        {% endif %}
+                    </div>
+
+                    <h5 class="fw-bold mb-3">Upload Payment Slip</h5>
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="mb-4">
+                            <label class="form-label text-muted">Please transfer the exact amount to the above bank account and upload a clear photo or PDF of the bank slip / transfer receipt.</label>
+                            <input type="file" class="form-control form-control-lg" name="receipt" accept="image/*,.pdf" required>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('student.browse_courses') }}" class="btn btn-light rounded-pill px-4">Cancel</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5">Submit Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

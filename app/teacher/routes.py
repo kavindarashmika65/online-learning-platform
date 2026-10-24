@@ -9,6 +9,9 @@ from app import db
 from app.models.course import Course, Category
 from app.models.lesson import Lesson
 from werkzeug.utils import secure_filename
+from app.teacher.forms import BankDetailsForm
+from flask import request
+from app.models.enrollment import Enrollment
 
 def generate_slug(title):
     slug = re.sub(r'[^\w\s-]', '', title.lower())
@@ -19,14 +22,60 @@ def generate_slug(title):
 def dashboard():
     if current_user.role != 'teacher':
         abort(403)
+        
     courses = Course.query.filter_by(teacher_id=current_user.id).all()
-    return render_template('teacher/dashboard.html', courses=courses)
+    course_ids = [c.id for c in courses] if courses else []
+    
+    # Approved වූ සිසුන්ගේ දත්ත පමණක් ගණනය කිරීම
+    approved_enrollments = Enrollment.query.filter(
+        Enrollment.course_id.in_(course_ids),
+        Enrollment.status == 'approved'
+    ).all() if course_ids else []
+    
+    total_courses = len(courses)
+    total_students = len(set(e.student_id for e in approved_enrollments))
+    total_earnings = sum(e.course.price for e in approved_enrollments)
+    
+    # Approve කිරීම සඳහා Pending ඇති ලැයිස්තුව ලබාගැනීම
+    pending_requests = Enrollment.query.filter(
+        Enrollment.course_id.in_(course_ids),
+        Enrollment.status == 'pending'
+    ).all() if course_ids else []
+    
+    return render_template('teacher/dashboard.html',
+                           total_courses=total_courses,
+                           total_students=total_students,
+                           total_earnings=total_earnings,
+                           pending_requests=pending_requests)
+
+# Approve හෝ Reject කිරීමේ කේතය (ගොනුවේ අවසානයටම එක් කරන්න)
+# Approve හෝ Reject කිරීමේ කේතය
+@teacher_bp.route('/enrollment/<int:enrollment_id>/<action>', methods=['POST'])
+@login_required
+def handle_enrollment(enrollment_id, action):
+    if current_user.role != 'teacher':
+        abort(403)
+        
+    enrollment = Enrollment.query.get_or_404(enrollment_id)
+    if enrollment.course.teacher_id != current_user.id:
+        abort(403)
+        
+    if action == 'approve':
+        enrollment.status = 'approved'
+        flash(f'Payment approved for {enrollment.student.full_name}. They can now access the course.', 'success')
+    elif action == 'reject':
+        enrollment.status = 'rejected'
+        flash('Payment rejected.', 'danger')
+        
+    db.session.commit()
+    return redirect(url_for('teacher.dashboard'))
 
 @teacher_bp.route('/create-course', methods=['GET', 'POST'])
 @login_required
 def create_course():
     if current_user.role != 'teacher':
-        abort(403)
+        
+         abort(403)
         
     form = CourseForm()
     if form.validate_on_submit():
@@ -154,3 +203,26 @@ def earnings():
                            total_earnings=total_earnings, 
                            total_enrollments=total_enrollments, 
                            transactions=transactions)
+@teacher_bp.route('/bank-details', methods=['GET', 'POST'])
+@login_required
+def bank_details():
+    if current_user.role != 'teacher':
+        abort(403)
+    
+    form = BankDetailsForm()
+    if form.validate_on_submit():
+        current_user.bank_name = form.bank_name.data
+        current_user.branch = form.branch.data
+        current_user.account_name = form.account_name.data
+        current_user.account_number = form.account_number.data
+        db.session.commit()
+        flash('Bank details updated successfully!', 'success')
+        return redirect(url_for('teacher.bank_details'))
+    
+    if request.method == 'GET':
+        form.bank_name.data = current_user.bank_name
+        form.branch.data = current_user.branch
+        form.account_name.data = current_user.account_name
+        form.account_number.data = current_user.account_number
+        
+    return render_template('teacher/bank_details.html', form=form)    

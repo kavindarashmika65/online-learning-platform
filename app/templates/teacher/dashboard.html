@@ -11,6 +11,7 @@
                 <a href="{{ url_for('teacher.dashboard') }}" class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-home me-1"></i>Overview</a>
                 <a href="{{ url_for('teacher.my_courses') }}" class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-book me-1"></i>My Courses</a>
                 <a href="{{ url_for('teacher.earnings') }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-wallet me-1"></i>Earnings</a>
+                <a href="{{ url_for('teacher.bank_details') }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-university me-1"></i>Bank Details</a>
             </div>
         </div>
         <div class="col-md-4 text-md-end">
@@ -23,7 +24,7 @@
             <div class="card shadow-sm border-0 border-start border-primary border-4 h-100 rounded-4">
                 <div class="card-body p-4">
                     <h5 class="text-muted mb-2">Total Courses</h5>
-                    <h2 class="fw-bold mb-0">{{ courses|length }}</h2>
+                    <h2 class="fw-bold mb-0">{{ total_courses }}</h2>
                 </div>
             </div>
         </div>
@@ -31,7 +32,7 @@
             <div class="card shadow-sm border-0 border-start border-success border-4 h-100 rounded-4">
                 <div class="card-body p-4">
                     <h5 class="text-muted mb-2">Total Students</h5>
-                    <h2 class="fw-bold mb-0">0</h2>
+                    <h2 class="fw-bold mb-0">{{ total_students }}</h2>
                 </div>
             </div>
         </div>
@@ -39,7 +40,7 @@
             <div class="card shadow-sm border-0 border-start border-warning border-4 h-100 rounded-4">
                 <div class="card-body p-4">
                     <h5 class="text-muted mb-2">Total Earnings</h5>
-                    <h2 class="fw-bold mb-0">LKR 0.00</h2>
+                    <h2 class="fw-bold mb-0">{{ "%.2f"|format(total_earnings) }}</h2>
                 </div>
             </div>
         </div>
@@ -76,5 +77,56 @@
             {% endif %}
         </div>
     </div>
+    <div class="mt-5">
+        <h4 class="fw-bold mb-3 text-primary">Pending Payment Approvals</h4>
+        {% if pending_requests %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle bg-white shadow-sm rounded-4 border">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Bank Slip</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in pending_requests %}
+                    <tr>
+                        <td class="fw-bold">{{ req.student.full_name }}</td>
+                        <td>{{ req.course.title }}</td>
+                        <td>LKR {{ "%.2f"|format(req.course.price) }}</td>
+                        <td>{{ req.enrollment_date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if req.receipt_path %}
+                            <a href="{{ url_for('static', filename='uploads/receipts/' + req.receipt_path) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3">View Slip</a>
+                            {% else %}
+                            <span class="text-muted">No Slip</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('teacher.handle_enrollment', enrollment_id=req.id, action='approve') }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">Approve</button>
+                            </form>
+                            <form action="{{ url_for('teacher.handle_enrollment', enrollment_id=req.id, action='reject') }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 ms-1">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-light border rounded-3 text-center text-muted p-4">
+            No pending payment approvals at the moment.
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
+    

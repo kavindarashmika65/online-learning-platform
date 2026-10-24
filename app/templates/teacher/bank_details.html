@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Bank Details - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="fw-bold text-primary mb-0">Update Bank Details</h2>
+                        <a href="{{ url_for('teacher.dashboard') }}" class="btn btn-outline-secondary rounded-pill btn-sm">Back to Dashboard</a>
+                    </div>
+                    
+                    <form method="POST" action="">
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            {{ form.bank_name.label(class="form-label fw-bold") }}
+                            {{ form.bank_name(class="form-control", placeholder="e.g. Bank of Ceylon") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.branch.label(class="form-label fw-bold") }}
+                            {{ form.branch(class="form-control", placeholder="e.g. Colombo 01") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.account_name.label(class="form-label fw-bold") }}
+                            {{ form.account_name(class="form-control", placeholder="e.g. K A Rashmika") }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.account_number.label(class="form-label fw-bold") }}
+                            {{ form.account_number(class="form-control", placeholder="e.g. 123456789") }}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
