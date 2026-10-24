@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Create Course - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <h2 class="fw-bold text-primary mb-4">Create New Course</h2>
+                    <form method="POST" action="">
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-bold") }}
+                            {{ form.title(class="form-control", placeholder="Enter course title") }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">{{ form.title.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label fw-bold") }}
+                            {{ form.description(class="form-control", rows="5", placeholder="Describe your course") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small mt-1">{{ form.description.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.price.label(class="form-label fw-bold") }}
+                            {{ form.price(class="form-control", placeholder="e.g., 1500.00") }}
+                            {% if form.price.errors %}
+                                <div class="text-danger small mt-1">{{ form.price.errors[0] }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
