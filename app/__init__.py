@@ -44,4 +44,7 @@ def create_app(config_class=Config):
     from app.teacher import teacher_bp
     app.register_blueprint(teacher_bp, url_prefix='/teacher')
 
+    from app.admin import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    
     return app

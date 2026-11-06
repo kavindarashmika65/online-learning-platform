@@ -188,21 +188,7 @@ def edit_course(course_id):
         
     return render_template('teacher/edit_course.html', form=form, course=course)
 
-@teacher_bp.route('/earnings')
-@login_required
-def earnings():
-    if current_user.role != 'teacher':
-        abort(403)
-    
-    # දැනට හිස් දත්ත යවමු (Payment ගොනු සැකසූ පසු මෙය යාවත්කාලීන කළ හැක)
-    total_earnings = 0.00
-    total_enrollments = 0
-    transactions = []
-    
-    return render_template('teacher/earnings.html', 
-                           total_earnings=total_earnings, 
-                           total_enrollments=total_enrollments, 
-                           transactions=transactions)
+
 @teacher_bp.route('/bank-details', methods=['GET', 'POST'])
 @login_required
 def bank_details():
@@ -226,3 +212,29 @@ def bank_details():
         form.account_number.data = current_user.account_number
         
     return render_template('teacher/bank_details.html', form=form)    
+
+@teacher_bp.route('/earnings')
+@login_required
+def earnings():
+    if current_user.role != 'teacher':
+        abort(403)
+    
+    # Get courses belonging to the current teacher
+    courses = Course.query.filter_by(teacher_id=current_user.id).all()
+    course_ids = [c.id for c in courses] if courses else []
+    
+    # Fetch only 'approved' enrollments for these courses
+    approved_enrollments = Enrollment.query.filter(
+        Enrollment.course_id.in_(course_ids),
+        Enrollment.status == 'approved'
+    ).order_by(Enrollment.enrollment_date.desc()).all() if course_ids else []
+    
+    # Calculate totals
+    total_earnings = sum(e.course.price for e in approved_enrollments)
+    total_enrollments = len(approved_enrollments)
+    transactions = approved_enrollments
+    
+    return render_template('teacher/earnings.html', 
+                           total_earnings=total_earnings, 
+                           total_enrollments=total_enrollments, 
+                           transactions=transactions)
